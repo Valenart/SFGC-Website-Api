@@ -1,0 +1,25 @@
+POST http://localhost:3333/login
+Content-type: application/json
+
+    {
+        "title": "titulo de teste",
+        "description": " teste de descrição",
+        "dateEvent": "20/06/2024"
+    }
+
+###
+GET http://localhost:3333/postagem
+
+
+###
+PUT http://localhost:3333/postagem/03c1437c-0072-4244-88cd-bc658d47dbe2
+Content-type: application/json
+
+    {
+        "title": "titulo de teste editado",
+        "description": " teste de descrição editado",
+        "dateEvent": "25/06/2024"
+    }
+
+###
+DELETE http://localhost:3333/postagem/03c1437c-0072-4244-88cd-bc658d47dbe2

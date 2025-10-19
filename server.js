@@ -1,54 +1,114 @@
 import { fastify } from 'fastify';
-import { DatabaseMemory } from './databasememory.js';
+import dotenv from 'dotenv';
+import fastifyJwt from 'fastify-jwt';
+import { db } from './db.js';
+
+// Carrega variáveis de ambiente do arquivo .env (se existir)
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.warn('Warning: JWT_SECRET não definido. Defina em .env para segurança.');
+}
 
 
-const server = fastify();
+const server = fastify({ logger: true });
 
-const database = new DatabaseMemory();
-
-
-
-server.get('/login', (req, res) => {
+server.register(fastifyJwt, { secret: JWT_SECRET || 'dev-secret' });
 
 
-    const { title, description, dateEvent } = req.body;
+async function authenticate(req, reply) {
+    try {
+        await req.jwtVerify();
+    } catch (err) {
+        return reply.code(401).send({ message: 'Unauthorized' });
+    }
+}
 
-    const hoje = new Date();
-    const dataBR = hoje.toLocaleDateString('pt-BR');
+/*
+    Rotas principais (simples e comentadas):
+    - POST /auth/login   -> autentica o usuário e retorna JWT
+    - GET  /posts        -> lista postagens (público)
+    - POST /posts        -> cria postagem (precisa de JWT)
+    - PUT  /posts/:id    -> atualiza postagem (precisa de JWT)
+    - DELETE /posts/:id -> deleta postagem (precisa de JWT)
 
-    database.create({
-        title: title || 'Primeira Postagem',
-        description: description || 'Conteudo da primeira postagem',
-        dateEvent: dateEvent || dataBR,
-        dateCreated: dataBR,
+    Nota: mantive tudo simples para facilitar entendimento.
+*/
+
+server.post('/auth/login', async (req, reply) => {
+
+    const { username, password } = req.body ?? {};
+    if (!username || !password) return reply.code(400).send({ message: 'username and password required' });
+
+    const user = await db.getUserByUsername(username);
+    if (!user) return reply.code(401).send({ message: 'Invalid credentials' });
+
+    const bcrypt = await import('bcryptjs');
+    const match = bcrypt.compareSync(password, user.password_hash);
+
+    if (!match) return reply.code(401).send({ message: 'Invalid credentials' });
+
+    const token = server.jwt.sign({ userId: user.id, username: user.username });
+    return reply.send({ token });
+});
+
+// Listar posts (público)
+server.get('/posts', async (req, reply) => {
+    const posts = await db.getPosts();
+    return reply.status(200).send({ message: 'Listando Posts' }, posts);
+});
+
+// Criar post (protegido)
+server.post('/posts', { preHandler: authenticate }, async (req, reply) => {
+    const payload = req.user;
+    const { title, description, data_evento, image_url } = req.body ?? {};
+    if (!title) return reply.code(400).send({ message: 'title is required' });
+
+    const postId = await db.createPost({
+        user_id: payload.userId,
+        title,
+        description,
+        data_evento,
+        image_url
     });
 
-    return res ? res.status(201).send({
-        message: 'Postagem criada com sucesso',
-    }) : res.status(404).send({
-        message: 'Erro ao criar postagem'
-    });
+    return reply.code(201).send({ message: 'Post criado', id: postId });
 });
 
+// Atualizar post (protegido, somente autor)
+server.put('/posts/:id', { preHandler: authenticate }, async (req, reply) => {
+    const payload = req.user;
+    const { id } = req.params;
+    const existing = await db.getPostById(id);
+    if (!existing) return reply.code(404).send({ message: 'Post não encontrado' });
+    if (existing.user_id !== payload.userId) return reply.code(403).send({ message: 'Forbidden' });
 
-server.post('/login', () => {
-
-
-    return database.list();
+    const { title, description, data_evento, image_url } = req.body ?? {};
+    await db.updatePost(id, { title, description, data_evento, image_url });
+    return reply.send({ message: 'Post atualizado' });
 });
 
-server.get('/postagem', () => {
-    return 'usuario';
+// Deletar post (protegido, somente autor)
+server.delete('/posts/:id', { preHandler: authenticate }, async (req, reply) => {
+    const payload = req.user;
+    const { id } = req.params;
+    const existing = await db.getPostById(id);
+    if (!existing) return reply.code(404).send({ message: 'Post não encontrado' });
+    if (existing.user_id !== payload.userId) return reply.code(403).send({ message: 'Forbidden' });
+
+    await db.deletePost(id);
+    return reply.code(202).send({ message: 'Post deletado' });
 });
 
-server.put(`/postagem/:id`, () => {
-    return 'usuario';
-});
+// Inicia o servidor
+const start = async () => {
+    try {
+        await server.listen({ port: 3333 });
+    } catch (err) {
+        server.log.error(err);
+        process.exit(1);
+    }
+};
 
-server.delete(`/postagem/:id`, () => {
-    return 'usuario';
-});
-
-server.listen({
-    port: 3333
-})
+start();
