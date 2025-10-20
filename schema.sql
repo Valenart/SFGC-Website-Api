@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS posts (
   title VARCHAR(255) NOT NULL,
   description TEXT,
   data_postagem TIMESTAMPTZ NOT NULL DEFAULT now(),
-  data_torneio DATE,
+  data_evento DATE,
   image_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()

@@ -10,10 +10,10 @@ export class DatabaseMemory {
     }
 
     create(postagem) {
-        const videoId = randomUUID();
-        this.#postagens.set(videoId, postagem);
+        const postagemId = randomUUID();
+        this.#postagens.set(postagemId, postagem);
 
-        return videoId;
+        return postagemId;
     }
 
     update(id, postagem) {

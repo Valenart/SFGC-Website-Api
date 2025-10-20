@@ -1,10 +1,14 @@
 import postgres from 'postgres';
+import 'dotenv/config';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
 
-const sql = postgres(process.env.DATABASE_URL, { ssl: 'require' });
+const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+const URL = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}/${PGDATABASE}?sslmode=require&options=project%3D${ENDPOINT_ID}`;
+
+export const sql = postgres(URL, { ssl: 'require' });
 
 export const db = {
     // ADMINISTRAÇÃO

@@ -1,4 +1,4 @@
-POST http://localhost:3333/login
+POST http://localhost:3333/posts
 Content-type: application/json
 
     {
@@ -8,11 +8,11 @@ Content-type: application/json
     }
 
 ###
-GET http://localhost:3333/postagem
+GET http://localhost:3333/posts
 
 
 ###
-PUT http://localhost:3333/postagem/03c1437c-0072-4244-88cd-bc658d47dbe2
+PUT http://localhost:3333/posts/3
 Content-type: application/json
 
     {
@@ -22,4 +22,4 @@ Content-type: application/json
     }
 
 ###
-DELETE http://localhost:3333/postagem/03c1437c-0072-4244-88cd-bc658d47dbe2
+DELETE http://localhost:3333/posts/3
