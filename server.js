@@ -11,11 +11,9 @@ if (!JWT_SECRET) {
     console.warn('Warning: JWT_SECRET não definido. Defina em .env para segurança.');
 }
 
-
 const server = fastify({ logger: true });
 
 server.register(fastifyJwt, { secret: JWT_SECRET || 'dev-secret' });
-
 
 async function authenticate(req, reply) {
     try {
@@ -39,15 +37,15 @@ async function authenticate(req, reply) {
 server.post('/auth/login', async (req, reply) => {
 
     const { username, password } = req.body ?? {};
-    if (!username || !password) return reply.code(400).send({ message: 'username and password required' });
+    if (!username || !password) return reply.code(400).send({ message: 'usuário e senha são obrigatórios' });
 
     const user = await db.getUserByUsername(username);
-    if (!user) return reply.code(401).send({ message: 'Invalid credentials' });
+    if (!user) return reply.code(401).send({ message: 'Credenciais inválidas' });
 
     const bcrypt = await import('bcryptjs');
-    const match = bcrypt.compareSync(password, user.password_hash);
+    const senha = bcrypt.compareSync(password, user.password_hash);
 
-    if (!match) return reply.code(401).send({ message: 'Invalid credentials' });
+    if (!senha) return reply.code(401).send({ message: 'Credenciais inválidas' });
 
     const token = server.jwt.sign({ userId: user.id, username: user.username });
     return reply.send({ token });
@@ -59,7 +57,7 @@ server.get('/posts', async (req, reply) => {
     return reply.status(200).send({ message: 'Listando Posts' }, posts);
 });
 
-// Criar post (protegido)
+// Criar post (privado)
 server.post('/posts', { preHandler: authenticate }, async (req, reply) => {
     const payload = req.user;
     const { title, description, data_evento, image_url } = req.body ?? {};
@@ -76,7 +74,7 @@ server.post('/posts', { preHandler: authenticate }, async (req, reply) => {
     return reply.code(201).send({ message: 'Post criado', id: postId });
 });
 
-// Atualizar post (protegido, somente autor)
+// Atualizar post (privado, somente autor)
 server.put('/posts/:id', { preHandler: authenticate }, async (req, reply) => {
     const payload = req.user;
     const { id } = req.params;
@@ -89,7 +87,7 @@ server.put('/posts/:id', { preHandler: authenticate }, async (req, reply) => {
     return reply.send({ message: 'Post atualizado' });
 });
 
-// Deletar post (protegido, somente autor)
+// Deletar post (privado, somente autor)
 server.delete('/posts/:id', { preHandler: authenticate }, async (req, reply) => {
     const payload = req.user;
     const { id } = req.params;
