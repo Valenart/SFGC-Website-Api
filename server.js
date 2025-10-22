@@ -49,7 +49,7 @@ const PORT = process.env.PORT ? Number(process.env.PORT) : 3333;
 
 const start = async () => {
     try {
-        await server.listen({ port: PORT });
+        await server.listen({ host: '0.0.0.0', port: PORT });
         server.log.info(`Server running on port ${PORT}`);
     } catch (err) {
         server.log.error(err);
