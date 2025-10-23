@@ -2,7 +2,6 @@ import postgres from 'postgres';
 import 'dotenv/config';
 import dotenv from 'dotenv';
 import { randomUUID } from 'node:crypto';
-import { randomUUID } from 'node:crypto';
 
 dotenv.config();
 
