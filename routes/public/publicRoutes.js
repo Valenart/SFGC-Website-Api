@@ -21,7 +21,12 @@ export async function publicRoutes(server, options) {
     // Listar posts (público)
     server.get('/posts', async (req, reply) => {
         const posts = await db.getPosts();
-        return reply.status(200).send({ message: 'Listando Posts', posts });
+
+        try {
+            return reply.status(200).send({ message: 'Listando Posts', posts });
+        } catch (error) {
+            return reply.status(500).send({ message: 'Erro ao listar posts', error: error.message });
+        }
     });
 }
 

@@ -1,4 +1,4 @@
-POST http://localhost:3333/posts
+POST https://sfgc-website-api.onrender.com/posts
 Content-type: application/json
 
     {
@@ -8,11 +8,10 @@ Content-type: application/json
     }
 
 ###
-GET http://localhost:3333/posts
-
+GET https://sfgc-website-api.onrender.com/posts
 
 ###
-PUT http://localhost:3333/posts/3
+PUT https://sfgc-website-api.onrender.com/posts/3
 Content-type: application/json
 
     {
@@ -22,4 +21,4 @@ Content-type: application/json
     }
 
 ###
-DELETE http://localhost:3333/posts/3
+DELETE https://sfgc-website-api.onrender.com/posts/3

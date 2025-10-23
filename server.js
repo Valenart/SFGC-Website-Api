@@ -1,6 +1,7 @@
 import { fastify } from 'fastify';
 import dotenv from 'dotenv';
 import fastifyJwt from 'fastify-jwt';
+import fastifyCors from '@fastify/cors';
 import { db } from './db.js';
 import { DatabasePostgres } from './database-postgres.js';
 import publicRoutes from './routes/public/publicRoutes.js';
@@ -20,7 +21,17 @@ const server = fastify({ logger: true });
 
 server.register(fastifyJwt, { secret: JWT_SECRET || 'dev-secret' });
 
-// Decorator para reutilizar autenticação nas rotas privadas
+
+/**CORS**/
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+const CORS_ALLOW_METHODS = process.env.CORS_ALLOW_METHODS || 'GET,POST,PUT,DELETE,OPTIONS';
+server.register(fastifyCors, {
+    origin: CORS_ORIGIN,
+    methods: CORS_ALLOW_METHODS.split(',').map(m => m.trim()),
+    allowedHeaders: ['Content-Type', 'Authorization']
+});
+
+
 server.decorate('authenticate', async function (req, reply) {
     try {
         await req.jwtVerify();
