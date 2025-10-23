@@ -1,4 +1,4 @@
--- Schema SQL (Postgres) - tables users and posts (IDs inteiros)
+-- Schema SQL (Postgres) - tabela de usuário e dos posts (IDs inteiros)
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (

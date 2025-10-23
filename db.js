@@ -2,18 +2,22 @@ import postgres from 'postgres';
 import 'dotenv/config';
 import dotenv from 'dotenv';
 import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 dotenv.config();
 
 /*
-    Rotas principais (simples e comentadas):
-    - POST /auth/login   -> autentica o usuário e retorna JWT
-    - GET  /posts        -> lista postagens (público)
-    - POST /posts        -> cria postagem (precisa de JWT)
-    - PUT  /posts/:id    -> atualiza postagem (precisa de JWT)
-    - DELETE /posts/:id -> deleta postagem (precisa de JWT)
+    ESTE ARQUIVO CENTRALIZA TODAS AS OPERAÇÕES RELACIONADAS AO BANCO DE DADOS.
+    CADA FUNÇÃO REALIZA UMA QUERY SQL ESPECÍFICA PARA ATENDER ÀS NECESSIDADES DO SISTEMA.
 
-    Nota: mantive tudo simples para facilitar entendimento.
+    ROTAS PRINCIPAIS:
+    - POST /AUTH/LOGIN   -> AUTENTICA O USUÁRIO E RETORNA JWT (PÚBLICO)
+    - GET  /POSTS        -> LISTA POSTAGENS (PÚBLICO)
+    - POST /POSTS        -> CRIA POSTAGEM (PRECISA DE JWT)
+    - PUT  /POSTS/:ID    -> ATUALIZA POSTAGEM (PRECISA DE JWT)
+    - DELETE /POSTS/:ID  -> DELETA POSTAGEM (PRECISA DE JWT)
+
+    NOTA: TENTEI MANTER TUDO SIMPLES PARA FACILITAR O ENTENDIMENTO E A MANUTENÇÃO :)
 */
 
 const { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
@@ -27,8 +31,8 @@ export const getUserByUsername = async (username) => {
     return rows[0];
 };
 
-// Listar posts
-export const listPosts = async (search) => {
+// LISTAR POSTS
+export const getPosts = async (search) => {
     if (search) {
         return await sql`select * from posts where title ilike ${'%' + search + '%'} order by id desc`;
     } else {
@@ -65,6 +69,22 @@ export const updatePost = async (id, postagem) => {
 // Deletar post
 export const deletePost = async (id) => {
     await sql`DELETE FROM posts WHERE id = ${id}`;
+};
+
+// BUSCAR POST POR ID
+export const getPostById = async (id) => {
+    const rows = await sql`select * from posts where id = ${id} limit 1`;
+    return rows[0];
+};
+
+// ADICIONANDO EXPORTAÇÃO DO OBJETO DB CONSOLIDADO
+export const db = {
+    getUserByUsername,
+    getPosts,
+    createPost,
+    updatePost,
+    deletePost,
+    getPostById
 };
 
 export default sql;
