@@ -3,14 +3,11 @@ import dotenv from 'dotenv';
 import fastifyJwt from 'fastify-jwt';
 import fastifyCors from '@fastify/cors';
 import { db } from './db.js';
-import { DatabasePostgres } from './database-postgres.js';
 import publicRoutes from './routes/public/publicRoutes.js';
 import privateRoutes from './routes/private/privateRoutes.js';
 
 // Carrega variáveis de ambiente do arquivo .env (se existir)
 dotenv.config();
-
-const database = new DatabasePostgres();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -19,7 +16,7 @@ if (!JWT_SECRET) {
 
 const server = fastify({ logger: true });
 
-server.register(fastifyJwt, { secret: JWT_SECRET || 'dev-secret' });
+server.register(fastifyJwt, { secret: JWT_SECRET });
 
 
 /**CORS**/
@@ -39,17 +36,6 @@ server.decorate('authenticate', async function (req, reply) {
         return reply.code(401).send({ message: 'Unauthorized' });
     }
 });
-
-/*
-    Rotas principais (simples e comentadas):
-    - POST /auth/login   -> autentica o usuário e retorna JWT
-    - GET  /posts        -> lista postagens (público)
-    - POST /posts        -> cria postagem (precisa de JWT)
-    - PUT  /posts/:id    -> atualiza postagem (precisa de JWT)
-    - DELETE /posts/:id -> deleta postagem (precisa de JWT)
-
-    Nota: mantive tudo simples para facilitar entendimento.
-*/
 
 // Registrar rotas
 server.register(publicRoutes);

@@ -1,3 +1,6 @@
+// Este arquivo foi consolidado em db.js e não é mais necessário.
+// Por favor, use os métodos centralizados em db.js para todas as operações de banco de dados.
+
 import { randomUUID } from 'node:crypto';
 
 import { sql } from './db.js';
