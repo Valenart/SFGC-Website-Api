@@ -11,6 +11,10 @@ dotenv.config();
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+const origins = CORS_ORIGIN.split(',').map(o => o.trim());
+
+
+
 const CORS_ALLOW_METHODS = process.env.CORS_ALLOW_METHODS || 'GET,POST,PUT,DELETE,OPTIONS';
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3333;
 
@@ -24,9 +28,10 @@ const server = fastify({ logger: true });
 // PLUGINS
 server.register(fastifyJwt, { secret: JWT_SECRET });
 server.register(fastifyCors, {
-    origin: CORS_ORIGIN,
-    methods: CORS_ALLOW_METHODS.split(',').map(m => m.trim()),
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: origins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 });
 
 // DECORATORS
