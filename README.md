@@ -1,4 +1,4 @@
-# SFGC Website API
+# SFGC Website BackEnd
 
 Bem-vindo(a) ao repositório do **SFGC Website API**! Este é o back-end que alimenta a aplicação front-end do SFGC. Aqui, você encontrará todas as informações necessárias para entender este projeto.
 
