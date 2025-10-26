@@ -28,7 +28,7 @@ const server = fastify({ logger: true });
 // PLUGINS
 server.register(fastifyJwt, { secret: JWT_SECRET });
 server.register(fastifyCors, {
-    origin: origins,
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
