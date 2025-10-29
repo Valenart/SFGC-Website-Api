@@ -11,6 +11,9 @@ Content-type: application/json
 GET https://sfgc-website-api.onrender.com/posts
 
 ###
+GET https://sfgc-website-api.onrender.com/photos
+
+###
 PUT https://sfgc-website-api.onrender.com/posts/3
 Content-type: application/json
 

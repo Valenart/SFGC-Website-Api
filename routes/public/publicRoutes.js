@@ -20,8 +20,6 @@ export async function publicRoutes(server, options) {
         return reply.send({ token });
     });
 
-
-
     // LISTAR POSTS (PÚBLICO)
     server.get('/posts', async (req, reply) => {
         const posts = await db.getPosts();
@@ -31,6 +29,16 @@ export async function publicRoutes(server, options) {
             return reply.status(500).send({ message: 'Erro ao listar posts', error: error.message });
         }
     });
+
+    // LISTAR FOTOS (PÚBLICO)
+    server.get('/photos', async (req, reply) => {
+        const photos = await db.getPhotos();
+        try {
+            return reply.status(200).send({ message: 'Listando Fotos', photos });
+        } catch (error) {
+            return reply.status(500).send({ message: 'Erro ao listar Fotos', error: error.message });
+        }
+    })
 }
 
 export default publicRoutes;

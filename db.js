@@ -12,6 +12,7 @@ dotenv.config();
     ROTAS PRINCIPAIS:
     - POST /AUTH/LOGIN   -> AUTENTICA O USUÁRIO E RETORNA JWT (PÚBLICO)
     - GET  /POSTS        -> LISTA POSTAGENS (PÚBLICO)
+    - GET  /PHOTOS       -> LISTA FOTOS (PÚBLICO)
     - POST /POSTS        -> CRIA POSTAGEM (PRECISA DE JWT)
     - PUT  /POSTS/:ID    -> ATUALIZA POSTAGEM (PRECISA DE JWT)
     - DELETE /POSTS/:ID  -> DELETA POSTAGEM (PRECISA DE JWT)
@@ -39,7 +40,12 @@ export const getPosts = async (search) => {
     }
 };
 
-// Criar post
+//LISTAR FOTOS
+export const getPhotos = async () => {
+    return await sql`select * from photos order by id desc`;
+}
+
+// CRIAR POST
 export const createPost = async (postagem) => {
     const postagemId = randomUUID();
     const { title, description, data_postagem, data_evento, image_url } = postagem;
@@ -50,7 +56,7 @@ export const createPost = async (postagem) => {
     `;
 };
 
-// Atualizar post
+// ATUALIZAR POSTS
 export const updatePost = async (id, postagem) => {
     const { title, description, data_evento, image_url } = postagem;
 
@@ -65,7 +71,7 @@ export const updatePost = async (id, postagem) => {
     `;
 };
 
-// Deletar post
+// DELETAR POSTS
 export const deletePost = async (id) => {
     await sql`DELETE FROM posts WHERE id = ${id}`;
 };
@@ -80,6 +86,7 @@ export const getPostById = async (id) => {
 export const db = {
     getUserByUsername,
     getPosts,
+    getPhotos,
     createPost,
     updatePost,
     deletePost,
